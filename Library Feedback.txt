@@ -1,0 +1,32 @@
+Reporte acerca del Estado de la Librería de Puntajes
+
+Autor de la Librería: Piccito, Nicolás 
+Autor del Reporte: Mosconi, Ignacio
+
+Comentarios acerca de la Documentación de la Librería
+
+La "wiki" vinculada a la funcionalidad de la librería se encuentra muy poco detallada, ya que tan solo se halla información relativa
+a tres métodos de una clase. A pesar de esto, los mismos figuran como meras "funciones" de la librería, y nunca se especifica que se
+debe instanciar a la clase en cuestión antes de estar habilitado a utilizar la funcionalidad que ofrecen estos métodos. A su vez, nunca
+se especifica que el usuario de la librería debe liberar la memoria manualmente mediante la realización del "delete" del objeto en
+caso de que se instancie mediante punteros. Hubiese sido más recomendable la creación de funciones ajenas a la clase para esto,
+las cuales se habrían encargado tanto de la creación como de la destrucción de la tabla de puntajes (algo semejante a
+"createScoreList" y "destroyScoreList"). De esta manera, se encubriría la existencia de la clase creada.
+Por otro lado, las instrucciones acerca de la instalación de la librería son sumamente escasas (la sección de la documentación
+titulada "Getting Started" parece ser una broma).
+En cuento a los aspectos positivos de la documentación, cabe mencionar que hubo un esfuerzo a la hora de redactarla en el idioma
+inglés, incluso habiendo palabras mal escritas o verbos con incorrecta conjugación. Asimismo, es apreciable el hecho de que
+los métodos enlistados aparecen en formato de código, facilitando su lectura.
+
+Comentarios acerca de la Funcionalidad de la Librería / Prácticas de Programación
+
+Cabe mencionar que la funcionalidad incluida en la biblioteca de programación funcionaba de forma adecuada: los métodos hacían
+lo que se suponía que tenían que hacer. No obstante, la funcionalidad de la librería era bastante escasa, con tan solo tres formas
+de operar con la tabla de puntajes. En cuanto a la claridad de su funcionamiento, el método "showHighScore" me pareció
+contraintuitivo. En primer lugar, el mismo recibe una cadena de caractéres y un entero para luego llenarlos con los valores
+correspondientes a una posición de la tabla, pero no "muestra" el puntaje como se deja a entender. En segundo lugar, es necesario
+pasarle la posición de la tabla de la cual se obtendrá el puntaje, pero para obtener al primero de la lista se debe pasar un valor
+de "0"; al estar hablando de una lista de puntajes, hubiese sido más cómodo trasladar los índices para hacerlos coincidir con
+el estado en el "ranking" ("1" para el primero, "2" para el segundo, etc.). Finalmente, los nombres de los métodos era inconsistente:
+algunos estaban escritos en "UpperCamelCase", mientras que había otros en "lowerCamelCase". La convención para el lenguaje
+C++ se corresponde con el último de los formatos, así que todos los métodos tendrían que haber sido escritos así.
