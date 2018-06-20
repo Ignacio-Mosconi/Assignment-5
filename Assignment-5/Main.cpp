@@ -1,34 +1,41 @@
 #include <windows.h>
+#include <string>
 #include <nana/gui.hpp>
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/button.hpp>
+#include <HS.h>
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
 {
 	using namespace nana;
+	using namespace HS;
 
-	//Define a form.
+	HighScore* leaderboard = new HighScore();
+	leaderboard->addHighScore(30, "Peter");
+	leaderboard->addHighScore(50, "Monica");
+	leaderboard->addHighScore(40, "Chandler");
+	leaderboard->addHighScore(70, "Rachel");
+
+	int highestScore;
+	string bestPlayer;
+	leaderboard->showHighScore(0, highestScore, bestPlayer);
+
 	form fm;
-
-	//Define a label and display a text.
-	label lab{ fm, "Hello, <bold blue size=16>Nana C++ Library</>" };
+	
+	label lab{ fm, "Highest Score: " + bestPlayer };
 	lab.format(true);
 
-	//Define a button and answer the click event.
 	button btn{ fm, "Quit" };
 	btn.events().click([&fm] {
 		fm.close();
 	});
 
-	//Layout management
 	fm.div("vert <><<><weight=80% text><>><><weight=24<><button><>><>");
 	fm["text"] << lab;
 	fm["button"] << btn;
 	fm.collocate();
 
-	//Show the form
 	fm.show();
 
-	//Start to event loop process, it blocks until the form is closed.
 	exec();
 }
