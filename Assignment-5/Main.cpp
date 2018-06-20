@@ -12,7 +12,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	using namespace nana;
 	using namespace HS;
 
-	HighScore* leaderboard = new HighScore();
+	HighScore* leaderboard = new HighScore(SCORES);
 	leaderboard->addHighScore(30, "Ross");
 	leaderboard->addHighScore(50, "Monica");
 	leaderboard->addHighScore(75, "Chandler");
@@ -34,7 +34,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 
 	string name;
 	int score;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < leaderboard->getCurrentSize(); i++)
 	{
 		leaderboard->showHighScore(i, score, name);
 		scores.at(0).append({ name, to_string(score)});
@@ -51,12 +51,25 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 		scores.clear();
 	});
 
+	button addNewButton(leaderboardForm, "Add");
+	addNewButton.events().click([leaderboard, &scores] {
+		leaderboard->addHighScore(50, "James");
+		scores.clear();
+		string name;
+		int score;
+		for (int i = 0; i < leaderboard->getCurrentSize(); i++)
+		{
+			leaderboard->showHighScore(i, score, name);
+			scores.at(0).append({ name, to_string(score) });
+		}
+	});
+
 	place layout(leaderboardForm);
 
-	layout.div("vertical <title> <weight = 70% scores> <weight = 10% margin = [10, 10] gap = 15 buttons>");
+	layout.div("vertical <title> <weight = 75% margin = 20 scores> <weight = 10% margin = [10, 10] gap = 15 buttons>");
 	layout["title"] << title;
 	layout["scores"] << scores;
-	layout["buttons"] << clearButton << quitButton;
+	layout["buttons"] << addNewButton << clearButton << quitButton;
 	layout.collocate();
 
 	leaderboardForm.show();
