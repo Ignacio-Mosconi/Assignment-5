@@ -17,13 +17,14 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	leaderboard->addHighScore(40, "Chandler");
 	leaderboard->addHighScore(70, "Rachel");
 
-	form leaderboardForm;
+	form leaderboardForm { rectangle(300, 200, 640, 480), appearance(true, true, true, false, true, false, false) };
 
-	label title { leaderboardForm, "<bold green size = 16 center> Highests Scores</>" };
+	label title { leaderboardForm, "<bold color = 0x177717 size = 24 center> Highest Scores</>" };
 	title.text_align(align::center);
 	title.format(true);
 
 	listbox scores{ leaderboardForm };
+
 	scores.append_header("Name");
 	scores.append_header("Score");
 
@@ -47,7 +48,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 
 	place formPlace { leaderboardForm };
 
-	formPlace.div("vertical <title> <weight = 50% scores> <margin = 10 gap = 15 buttons>");
+	formPlace.div("vertical <title> <weight = 70% scores> <weight = 10% margin = [10, 10] gap = 15 buttons>");
 	formPlace["title"] << title;
 	formPlace["scores"] << scores;
 	formPlace["buttons"] << clearButton << quitButton;
