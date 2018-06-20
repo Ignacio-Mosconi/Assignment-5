@@ -4,5 +4,6 @@
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480
 #define SCORES 6
+#define MAX_SCORES 15
 
 #endif

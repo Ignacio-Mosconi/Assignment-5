@@ -64,12 +64,32 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 		}
 	});
 
+	button increaseSizeButton(leaderboardForm, "+");
+	increaseSizeButton.events().click([leaderboard] {
+		if (leaderboard->getMaxSize() < MAX_SCORES)
+			leaderboard->resize(leaderboard->getMaxSize() + 1);
+	});
+
+	button decreaseSizeButton(leaderboardForm, "-");
+	decreaseSizeButton.events().click([leaderboard, &scores] {
+		if (leaderboard->getMaxSize() > 1)
+			leaderboard->resize(leaderboard->getMaxSize() - 1);
+		scores.clear();
+		string name;
+		int score;
+		for (int i = 0; i < leaderboard->getCurrentSize(); i++)
+		{
+			leaderboard->showHighScore(i, score, name);
+			scores.at(0).append({ name, to_string(score) });
+		}
+	});
+
 	place layout(leaderboardForm);
 
 	layout.div("vertical <title> <weight = 75% margin = 20 scores> <weight = 10% margin = [10, 10] gap = 15 buttons>");
 	layout["title"] << title;
 	layout["scores"] << scores;
-	layout["buttons"] << addNewButton << clearButton << quitButton;
+	layout["buttons"] << addNewButton << clearButton << increaseSizeButton << decreaseSizeButton << quitButton;
 	layout.collocate();
 
 	leaderboardForm.show();

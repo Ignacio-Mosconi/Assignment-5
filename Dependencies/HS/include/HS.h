@@ -23,5 +23,6 @@ namespace HS
 		void clearScore();
 		void resize(const int& newSize);
 		int getCurrentSize();
+		int getMaxSize();
 	};
 }
