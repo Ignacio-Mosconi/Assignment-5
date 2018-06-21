@@ -7,18 +7,41 @@
 #include <HS.h>
 #include "Definitions.h"
 
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
+void loadDefaultScores(HS::HighScore* leaderboard)
 {
-	using namespace nana;
-	using namespace HS;
-
-	HighScore* leaderboard = new HighScore(SCORES);
 	leaderboard->addHighScore(30, "Ross");
 	leaderboard->addHighScore(50, "Monica");
 	leaderboard->addHighScore(75, "Chandler");
 	leaderboard->addHighScore(70, "Rachel");
 	leaderboard->addHighScore(25, "Phoebe");
 	leaderboard->addHighScore(40, "Joey");
+}
+
+void loadListbox(HS::HighScore* leaderboard, nana::listbox& scores)
+{
+	string name;
+	int score;
+	for (int i = 0; i < leaderboard->getCurrentSize(); i++)
+	{
+		leaderboard->showHighScore(i, score, name);
+		scores.at(0).append({ name, to_string(score) });
+	}
+}
+
+void changeSizeCountLabel(HS::HighScore* leaderboard, nana::label& sizeCount)
+{
+	string currentSize = to_string(leaderboard->getCurrentSize());
+	string maxSize = to_string(leaderboard->getMaxSize());
+	sizeCount.caption("Scores: " + currentSize + "/" + maxSize);
+}
+
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
+{
+	using namespace nana;
+	using namespace HS;
+
+	HighScore* leaderboard = new HighScore(SCORES);
+	loadDefaultScores(leaderboard);
 
 	form leaderboardForm(API::make_center(WINDOW_WIDTH, WINDOW_HEIGHT), appear::decorate<>());
 	leaderboardForm.caption("Leaderboards - Powered by Nana & HS");
@@ -27,18 +50,17 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	title.text_align(align::center);
 	title.format(true);
 
+	label sizeCount(leaderboardForm, "Scores: 6/6");
+	sizeCount.text_align(align::center);
+
 	listbox scores(leaderboardForm);
 
 	scores.append_header("Name");
 	scores.append_header("Score");
+	scores.bgcolor(color_rgb(colors::dark_green));
+	scores.fgcolor(color_rgb(colors::white));
 
-	string name;
-	int score;
-	for (int i = 0; i < leaderboard->getCurrentSize(); i++)
-	{
-		leaderboard->showHighScore(i, score, name);
-		scores.at(0).append({ name, to_string(score)});
-	}
+	loadListbox(leaderboard, scores);
 
 	button quitButton(leaderboardForm, "Quit");
 	quitButton.events().click([&leaderboardForm] {
@@ -46,49 +68,50 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	});
 
 	button clearButton(leaderboardForm, "Clear");
-	clearButton.events().click([leaderboard, &scores] {
+	clearButton.events().click([leaderboard, &scores, &sizeCount] {
 		leaderboard->clearScore();
 		scores.clear();
+		changeSizeCountLabel(leaderboard, sizeCount);
 	});
 
 	button addNewButton(leaderboardForm, "Add");
-	addNewButton.events().click([leaderboard, &scores] {
+	addNewButton.events().click([leaderboard, &scores, &sizeCount] {
 		leaderboard->addHighScore(50, "James");
 		scores.clear();
-		string name;
-		int score;
-		for (int i = 0; i < leaderboard->getCurrentSize(); i++)
-		{
-			leaderboard->showHighScore(i, score, name);
-			scores.at(0).append({ name, to_string(score) });
-		}
+		loadListbox(leaderboard, scores);
+		changeSizeCountLabel(leaderboard, sizeCount);
 	});
 
 	button increaseSizeButton(leaderboardForm, "+");
-	increaseSizeButton.events().click([leaderboard] {
+	increaseSizeButton.events().click([leaderboard, &sizeCount] {
 		if (leaderboard->getMaxSize() < MAX_SCORES)
+		{
 			leaderboard->resize(leaderboard->getMaxSize() + 1);
+			changeSizeCountLabel(leaderboard, sizeCount);
+		}
 	});
 
 	button decreaseSizeButton(leaderboardForm, "-");
-	decreaseSizeButton.events().click([leaderboard, &scores] {
+	decreaseSizeButton.events().click([leaderboard, &scores, &sizeCount] {
 		if (leaderboard->getMaxSize() > 1)
-			leaderboard->resize(leaderboard->getMaxSize() - 1);
-		scores.clear();
-		string name;
-		int score;
-		for (int i = 0; i < leaderboard->getCurrentSize(); i++)
 		{
-			leaderboard->showHighScore(i, score, name);
-			scores.at(0).append({ name, to_string(score) });
+			leaderboard->resize(leaderboard->getMaxSize() - 1);
+			scores.clear();
+			loadListbox(leaderboard, scores);
+			changeSizeCountLabel(leaderboard, sizeCount);
 		}
 	});
 
 	place layout(leaderboardForm);
 
-	layout.div("vertical <title> <weight = 75% margin = 20 scores> <weight = 10% margin = [10, 10] gap = 15 buttons>");
+	layout.div("vertical <weight = 15% title>"
+			"<weight = 70% margin = 20 scores>" 
+			"<weight = 5% sizeCount>"
+			"<weight = 10% margin = [10, 10] gap = 15 buttons>");
+
 	layout["title"] << title;
 	layout["scores"] << scores;
+	layout["sizeCount"] << sizeCount;
 	layout["buttons"] << addNewButton << clearButton << increaseSizeButton << decreaseSizeButton << quitButton;
 	layout.collocate();
 
