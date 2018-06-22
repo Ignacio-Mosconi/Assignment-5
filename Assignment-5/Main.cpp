@@ -4,6 +4,7 @@
 #include <nana/gui/widgets/label.hpp>
 #include <nana/gui/widgets/listbox.hpp>
 #include <nana/gui/widgets/button.hpp>
+#include <nana/gui/widgets/textbox.hpp>
 #include <HS.h>
 #include "Definitions.h"
 
@@ -35,6 +36,54 @@ void changeSizeCountLabel(HS::HighScore* leaderboard, nana::label& sizeCount)
 	sizeCount.caption("Scores: " + currentSize + "/" + maxSize);
 }
 
+void createNewTextBoxForm(HS::HighScore* leaderboard, nana::listbox& scores, nana::label& sizeCount)
+{
+	using namespace nana;
+
+	form textBoxForm(API::make_center(300, 200), appear::decorate<>());
+
+	label textBoxFormTitle(textBoxForm, "<bold color = 0x177717 size = 12 center> New Score</>");
+	textBoxFormTitle.text_align(align::center);
+	textBoxFormTitle.format(true);
+
+	textbox nameField(textBoxForm);
+	textbox scoreField(textBoxForm);
+	nameField.tip_string("Name:          ").multi_lines(false);
+	scoreField.tip_string("Score:        ").multi_lines(false);
+
+	button addButton(textBoxForm, "Add");
+	addButton.events().click([leaderboard, &textBoxForm, &scores, &sizeCount, &nameField, &scoreField]
+	{
+		string newName;
+		int newScore;
+		nameField.getline(0, newName);
+		newScore = scoreField.to_int();
+		leaderboard->addHighScore(newScore, newName);
+		scores.clear();
+		loadListbox(leaderboard, scores);
+		changeSizeCountLabel(leaderboard, sizeCount);
+		textBoxForm.close();
+	});
+
+	button cancelButton(textBoxForm, "Cancel");
+	cancelButton.events().click([&textBoxForm]
+	{
+		textBoxForm.close();
+	});
+
+	textBoxForm.div("vertical <weight = 25% title>"
+		"<vertical weight = 50% gap = 10 margin = 10 arrange = [25, 25] textBoxes>"
+		"<weight = 25% margin = 10 gap = 10 buttons>");
+	textBoxForm["title"] << textBoxFormTitle;
+	textBoxForm["textBoxes"] << nameField << scoreField;
+	textBoxForm["buttons"] << addButton << cancelButton;
+	textBoxForm.collocate();
+
+	textBoxForm.show();
+
+	exec();
+}
+
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
 {
 	using namespace nana;
@@ -63,27 +112,28 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	loadListbox(leaderboard, scores);
 
 	button quitButton(leaderboardForm, "Quit");
-	quitButton.events().click([&leaderboardForm] {
+	quitButton.events().click([&leaderboardForm] 
+	{
 		leaderboardForm.close();
 	});
 
 	button clearButton(leaderboardForm, "Clear");
-	clearButton.events().click([leaderboard, &scores, &sizeCount] {
+	clearButton.events().click([leaderboard, &scores, &sizeCount] 
+	{
 		leaderboard->clearScore();
 		scores.clear();
 		changeSizeCountLabel(leaderboard, sizeCount);
 	});
 
 	button addNewButton(leaderboardForm, "Add");
-	addNewButton.events().click([leaderboard, &scores, &sizeCount] {
-		leaderboard->addHighScore(50, "James");
-		scores.clear();
-		loadListbox(leaderboard, scores);
-		changeSizeCountLabel(leaderboard, sizeCount);
+	addNewButton.events().click([leaderboard, &scores, &sizeCount]
+	{
+		createNewTextBoxForm(leaderboard, scores, sizeCount);
 	});
 
 	button increaseSizeButton(leaderboardForm, "+");
-	increaseSizeButton.events().click([leaderboard, &sizeCount] {
+	increaseSizeButton.events().click([leaderboard, &sizeCount] 
+	{
 		if (leaderboard->getMaxSize() < MAX_SCORES)
 		{
 			leaderboard->resize(leaderboard->getMaxSize() + 1);
@@ -92,7 +142,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	});
 
 	button decreaseSizeButton(leaderboardForm, "-");
-	decreaseSizeButton.events().click([leaderboard, &scores, &sizeCount] {
+	decreaseSizeButton.events().click([leaderboard, &scores, &sizeCount] 
+	{
 		if (leaderboard->getMaxSize() > 1)
 		{
 			leaderboard->resize(leaderboard->getMaxSize() - 1);
@@ -107,7 +158,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	layout.div("vertical <weight = 15% title>"
 			"<weight = 70% margin = 20 scores>" 
 			"<weight = 5% sizeCount>"
-			"<weight = 10% margin = [10, 10] gap = 15 buttons>");
+			"<weight = 10% margin = 10 gap = 15 buttons>");
 
 	layout["title"] << title;
 	layout["scores"] << scores;
