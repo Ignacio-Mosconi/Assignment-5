@@ -41,9 +41,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	using namespace nana;
 	using namespace HS;
 
+	// Creates an HS Library Leaderboard.
 	HighScore* leaderboard = new HighScore(SCORES);
 	loadDefaultScores(leaderboard);
 
+	// Creates the main form of the program, as well as its parts.
 	form leaderboardForm(API::make_center(WINDOW_WIDTH, WINDOW_HEIGHT), appear::decorate<>());
 	leaderboardForm.caption("Leaderboards - Powered by Nana & HS");
 
@@ -61,9 +63,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	scores.bgcolor(color_rgb(colors::dark_green));
 	scores.fgcolor(color_rgb(colors::white));
 
+	// Loads the previously created leaderboard into the form's listbox.
 	loadListbox(leaderboard, scores);
 
-	form textBoxForm(API::make_center(300, 200), appear::decorate<>());
+	// Creates the secondary text box form, which is used to enter new scores to the leaderboard.
+	form textBoxForm(API::make_center(300, 200), appearance(false, false, true, true, false, false, false));
 
 	label textBoxFormTitle(textBoxForm, "<bold color = 0x177717 size = 12 center> New Score</>");
 	textBoxFormTitle.text_align(align::center);
@@ -74,30 +78,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	nameField.tip_string("Name:          ").multi_lines(false);
 	scoreField.tip_string("Score:        ").multi_lines(false);
 
-	button addButton(textBoxForm, "Add");
-	addButton.events().click([leaderboard, &textBoxForm, &scores, &sizeCount, &nameField, &scoreField]
-	{
-		string newName;
-		int newScore;
-		nameField.getline(0, newName);
-		newScore = scoreField.to_int();
-		leaderboard->addHighScore(newScore, newName);
-		scores.clear();
-		loadListbox(leaderboard, scores);
-		changeSizeCountLabel(leaderboard, sizeCount);
-		textBoxForm.hide();
-	});
-
-	button cancelButton(textBoxForm, "Cancel");
-	cancelButton.events().click([&textBoxForm]
-	{
-		textBoxForm.hide();
-	});
-
+	// Defines the main form's buttons.
 	button quitButton(leaderboardForm, "Quit");
-	quitButton.events().click([&leaderboardForm] 
+	quitButton.events().click([&leaderboardForm, &textBoxForm] 
 	{
 		leaderboardForm.close();
+		textBoxForm.close();
 	});
 
 	button clearButton(leaderboardForm, "Clear");
@@ -112,7 +98,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	addNewButton.events().click([&textBoxForm]
 	{
 		textBoxForm.show();
-		nana::exec();
 	});
 
 	button increaseSizeButton(leaderboardForm, "+");
@@ -137,12 +122,34 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 		}
 	});
 
+	// Defines the secondary form's buttons.
+	button addButton(textBoxForm, "Add");
+	addButton.events().click([leaderboard, &textBoxForm, &scores, &sizeCount, &nameField, &scoreField]
+	{
+		string newName;
+		int newScore;
+		nameField.getline(0, newName);
+		newScore = scoreField.to_int();
+		leaderboard->addHighScore(newScore, newName);
+		scores.clear();
+		loadListbox(leaderboard, scores);
+		changeSizeCountLabel(leaderboard, sizeCount);
+		textBoxForm.hide();
+	});
+
+	button cancelButton(textBoxForm, "Cancel");
+	cancelButton.events().click([&textBoxForm]
+	{
+		textBoxForm.hide();
+	});
+
+	// Defines the layout of both forms.
 	place layout(leaderboardForm);
 
 	layout.div("vertical <weight = 15% title>"
-			"<weight = 70% margin = 20 scores>" 
-			"<weight = 5% sizeCount>"
-			"<weight = 10% margin = 10 gap = 15 buttons>");
+		"<weight = 70% margin = 20 scores>"
+		"<weight = 5% sizeCount>"
+		"<weight = 10% margin = 10 gap = 15 buttons>");
 
 	layout["title"] << title;
 	layout["scores"] << scores;
@@ -158,7 +165,9 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	textBoxForm["buttons"] << addButton << cancelButton;
 	textBoxForm.collocate();
 
+	// Shows the main form.
 	leaderboardForm.show();
 
+	// Starts to receive input.
 	exec();
 }
