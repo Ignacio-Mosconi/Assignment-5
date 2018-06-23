@@ -30,3 +30,9 @@ de "0"; al estar hablando de una lista de puntajes, hubiese sido más cómodo tras
 el estado en el "ranking" ("1" para el primero, "2" para el segundo, etc.). Finalmente, los nombres de los métodos era inconsistente:
 algunos estaban escritos en "UpperCamelCase", mientras que había otros en "lowerCamelCase". La convención para el lenguaje
 C++ se corresponde con el último de los formatos, así que todos los métodos tendrían que haber sido escritos así.
+
+Comentarios acerca del Estado del "Release" de GitHub
+
+Si bien los archivos "lib" correspondientes a la librería de puntajes se hallaban disponibles para descargar (tanto la versión "debug"
+como la versión "release"), entre los archivos no se ubicaban las cabeceras necesarias para utilizar la biblioteca. De este modo,
+se tuvo que recurrir descargar el repositorio con la finalidad de probar y utilizar la librería proporcionada.

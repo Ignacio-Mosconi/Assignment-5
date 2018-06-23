@@ -36,54 +36,6 @@ void changeSizeCountLabel(HS::HighScore* leaderboard, nana::label& sizeCount)
 	sizeCount.caption("Scores: " + currentSize + "/" + maxSize);
 }
 
-void createNewTextBoxForm(HS::HighScore* leaderboard, nana::listbox& scores, nana::label& sizeCount)
-{
-	using namespace nana;
-
-	form textBoxForm(API::make_center(300, 200), appear::decorate<>());
-
-	label textBoxFormTitle(textBoxForm, "<bold color = 0x177717 size = 12 center> New Score</>");
-	textBoxFormTitle.text_align(align::center);
-	textBoxFormTitle.format(true);
-
-	textbox nameField(textBoxForm);
-	textbox scoreField(textBoxForm);
-	nameField.tip_string("Name:          ").multi_lines(false);
-	scoreField.tip_string("Score:        ").multi_lines(false);
-
-	button addButton(textBoxForm, "Add");
-	addButton.events().click([leaderboard, &textBoxForm, &scores, &sizeCount, &nameField, &scoreField]
-	{
-		string newName;
-		int newScore;
-		nameField.getline(0, newName);
-		newScore = scoreField.to_int();
-		leaderboard->addHighScore(newScore, newName);
-		scores.clear();
-		loadListbox(leaderboard, scores);
-		changeSizeCountLabel(leaderboard, sizeCount);
-		textBoxForm.close();
-	});
-
-	button cancelButton(textBoxForm, "Cancel");
-	cancelButton.events().click([&textBoxForm]
-	{
-		textBoxForm.close();
-	});
-
-	textBoxForm.div("vertical <weight = 25% title>"
-		"<vertical weight = 50% gap = 10 margin = 10 arrange = [25, 25] textBoxes>"
-		"<weight = 25% margin = 10 gap = 10 buttons>");
-	textBoxForm["title"] << textBoxFormTitle;
-	textBoxForm["textBoxes"] << nameField << scoreField;
-	textBoxForm["buttons"] << addButton << cancelButton;
-	textBoxForm.collocate();
-
-	textBoxForm.show();
-
-	exec();
-}
-
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int nShowCmd)
 {
 	using namespace nana;
@@ -111,6 +63,37 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 
 	loadListbox(leaderboard, scores);
 
+	form textBoxForm(API::make_center(300, 200), appear::decorate<>());
+
+	label textBoxFormTitle(textBoxForm, "<bold color = 0x177717 size = 12 center> New Score</>");
+	textBoxFormTitle.text_align(align::center);
+	textBoxFormTitle.format(true);
+
+	textbox nameField(textBoxForm);
+	textbox scoreField(textBoxForm);
+	nameField.tip_string("Name:          ").multi_lines(false);
+	scoreField.tip_string("Score:        ").multi_lines(false);
+
+	button addButton(textBoxForm, "Add");
+	addButton.events().click([leaderboard, &textBoxForm, &scores, &sizeCount, &nameField, &scoreField]
+	{
+		string newName;
+		int newScore;
+		nameField.getline(0, newName);
+		newScore = scoreField.to_int();
+		leaderboard->addHighScore(newScore, newName);
+		scores.clear();
+		loadListbox(leaderboard, scores);
+		changeSizeCountLabel(leaderboard, sizeCount);
+		textBoxForm.hide();
+	});
+
+	button cancelButton(textBoxForm, "Cancel");
+	cancelButton.events().click([&textBoxForm]
+	{
+		textBoxForm.hide();
+	});
+
 	button quitButton(leaderboardForm, "Quit");
 	quitButton.events().click([&leaderboardForm] 
 	{
@@ -126,9 +109,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	});
 
 	button addNewButton(leaderboardForm, "Add");
-	addNewButton.events().click([leaderboard, &scores, &sizeCount]
+	addNewButton.events().click([&textBoxForm]
 	{
-		createNewTextBoxForm(leaderboard, scores, sizeCount);
+		textBoxForm.show();
+		nana::exec();
 	});
 
 	button increaseSizeButton(leaderboardForm, "+");
@@ -165,6 +149,14 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 	layout["sizeCount"] << sizeCount;
 	layout["buttons"] << addNewButton << clearButton << increaseSizeButton << decreaseSizeButton << quitButton;
 	layout.collocate();
+
+	textBoxForm.div("vertical <weight = 25% title>"
+		"<vertical weight = 50% gap = 10 margin = 10 arrange = [25, 25] textBoxes>"
+		"<weight = 25% margin = 10 gap = 10 buttons>");
+	textBoxForm["title"] << textBoxFormTitle;
+	textBoxForm["textBoxes"] << nameField << scoreField;
+	textBoxForm["buttons"] << addButton << cancelButton;
+	textBoxForm.collocate();
 
 	leaderboardForm.show();
 
