@@ -170,4 +170,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, char*, int n
 
 	// Starts to receive input.
 	exec();
+
+	delete leaderboard;
 }
